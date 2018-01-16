@@ -35,7 +35,7 @@ class AndroidDriver extends DeviceDriverBase {
   getTestApkPath(originalApkPath) {
     const originalApkPathObj = path.parse(originalApkPath);
     let splitPath = originalApkPathObj.dir.split(path.sep);
-    splitPath.splice(splitPath.length-1 , 0, 'androidTest');
+    splitPath.splice(_.findIndex(splitPath, (name) => name === 'apk') + 1, 0, 'androidTest');
     const testApkPath = path.join(splitPath.join(path.sep), `${originalApkPathObj.name}-androidTest${originalApkPathObj.ext}`);
 
     if (!fs.existsSync(testApkPath)) {
@@ -135,7 +135,7 @@ class AndroidDriver extends DeviceDriverBase {
         adbName = adbDevice.adbName;
         break;
       case 0:
-        throw new Error(`Could not find '${filter.name}' on the currently ADB attached devices: '${JSON.stringify(adbDevices)}', 
+        throw new Error(`Could not find '${filter.name}' on the currently ADB attached devices: '${JSON.stringify(adbDevices)}',
       try restarting adb 'adb kill-server && adb start-server'`);
         break;
       default:
@@ -165,7 +165,7 @@ class AndroidDriver extends DeviceDriverBase {
       landscape: 1, // top at left side landscape
       portrait: 0 // non-reversed portrait.
     };
-    
+
     const call = invoke.call(invoke.Android.Class(EspressoDetox), 'changeOrientation', invoke.Android.Integer(orientationMapping[orientation]));
     await this.invocationManager.execute(call);
   }
